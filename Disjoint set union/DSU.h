@@ -1,95 +1,105 @@
-#ifndef DSU_H
-#define DSU_H
+//author : ShivamBhalodia
 #include <vector>
+#ifndef DSU_H   //if DSU.h hasn't been included yet
+#define DSU_H //#define it so the compiler knows it has been included and can prevent including it twice
 
-//a class for disjoint set union data structure
 class DSU
 {
     public:
-        //constructs a DSU with n groups each with 1 element
-        DSU(int n)
+        //constructor that creats n different groups each with 1 element itself
+        DSU(int n);
+        
+        //add a new group
+        void newGroup();
+
+    	//finds the parent of the group to which element belongs
+        int Find(int a);
+        
+        //returns the number of elements in the group to which element belongs
+        int groupSize(int a);
+
+        //return true if element refers to a valid group
+        bool isValidId(int a);
+        
+        //merge two groups to which element a and element b belong
+        void Union(int a,int b);
+
+        //returns number of groups
+        int getnoOfGroups()
         {
-            countOfGroups = n;
-            parents = std::vector<int>(n);
-            ranks = std::vector<int>(n,1);
-            for(int i = 0; i < n; i++)
-                  parents[i] = i;
-        }
-
-        //add a new group to the DSU
-        void MakeSet();
-
-        //used to merge groups to which id1 and id2 belong
-        void Union(int id1, int id2);
-
-        //finds the root of the group to which id belongs
-        int Find(int id);
-
-        //returns the number of elements in the group to which id belongs
-        int groupSize(int id);
-
-        //return true if id belongs to a valid element
-        bool isValidId(int id)
-        {
-            if(id >= 0 && id < parents.size())
-                return 1;
-            return 0;
-        }
-
-        //returns number of disjoint sets
-        int getCountOfGroups()
-        {
-            return countOfGroups;
+            return noOfGroups;
         }
     private:
-        int countOfGroups;
-        std::vector<int> parents;
-        std::vector<int> ranks;
+        int noOfGroups;
+        std::vector<int>parents;
+        std::vector<int>sizee;
 };
-void DSU::MakeSet()
+
+DSU::DSU(int n)
 {
-   countOfGroups++;
-   int id = parents.size();
-   parents.push_back(id);
-   ranks.push_back(1);
+  	noOfGroups=n;
+    parents=std::vector<int>(n);
+    sizee=std::vector<int>(n,1);   //initially size is 1
+    for(int i=0;i<n;i++)
+        parents[i]=i;    //initially make element to parent of itself
 }
 
-void DSU::Union(int id1, int id2)
+void DSU::newGroup()
 {
-    if( !(isValidId(id1) && isValidId(id2)) )
+   noOfGroups++;
+   int a=parents.size();
+   parents.push_back(a);
+   sizee.push_back(1);
+}
+
+bool DSU::isValidId(int a)
+{
+    if(a>=0 && a<parents.size())
+        return 1;
+    return 0;
+}
+
+int DSU::Find(int a)
+{
+    if(!isValidId(a))
+      	return -1;
+    
+    while(parents[a]!=a)
+  	{
+        parents[a]=parents[parents[a]];
+        a=parents[a];
+    }
+    return a;
+   
+}
+
+int DSU::groupSize(int a)
+{
+    if(!isValidId(a))
+    	return -1;
+    return sizee[Find(a)];
+}
+
+void DSU::Union(int a,int b)
+{
+    if((!isValidId(a)) || (!isValidId(b)))
         return;
-    int group1 = Find(id1);
-    int group2 = Find(id2);
-    if(group1 == group2)
-          return;
-    countOfGroups--;
-    if(ranks[group1] >= ranks[group2])
+    int group1=Find(a);
+    int group2=Find(b);
+    if(group1==group2)
+        return;
+    noOfGroups--;
+    //append smaller group to bigger group
+    if(sizee[group1]>=sizee[group2])     
     {
-        parents[group2] = group1;
-        ranks[group1] += ranks[group2];
+        parents[group2]=group1;
+        sizee[group1]+=sizee[group2];
     }
     else
     {
-        parents[group1] = group2;
-        ranks[group2] += ranks[group1];
+        parents[group1]=group2;
+        sizee[group2]+=sizee[group1];
     }
 }
 
-int DSU::Find(int id)
-{
-   if(!isValidId(id))
-      return -1;
-   int parent = parents[id];
-   if(parent == id)
-      return parent;
-   else return parents[id] = Find(parent);
-}
-
-int DSU::groupSize(int id)
-{
-    if(!isValidId(id))
-      return -1;
-    return ranks[Find(id)];
-}
-
-#endif // DSU_H
+#endif //DSU_H
