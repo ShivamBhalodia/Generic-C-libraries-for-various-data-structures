@@ -1,7 +1,7 @@
 //author : ShivamBhalodia
-#include <vector>
 #ifndef DSU_H   //if DSU.h hasn't been included yet
 #define DSU_H //#define it so the compiler knows it has been included and can prevent including it twice
+#include <vector>
 
 class DSU
 {
