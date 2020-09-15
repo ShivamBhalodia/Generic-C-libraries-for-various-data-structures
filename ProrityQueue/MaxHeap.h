@@ -14,18 +14,17 @@ class MaxHeap
         
         //Construct empty heap of user defined priority
         MaxHeap<T>(bool (*comp)(T a,T b));
-        //return the highest priority item currently in the Max Heap.
+        //Return the highest priority item currently in the Max Heap.
         T top();
         //Insert an item in the Max Heap.
         void push(T a);
-        //deletes the highest priority item currently in the Max Heap.
+        //Deletes the highest priority item currently in the Max Heap.
         void pop();
         //To check whether the Max Heap is empty or not
         bool isEmpty();
         
     private:
       
-        //return true if obj1 compares less than obj2
         bool (*compare)(T a,T b);
         std::vector<T>heap;
         void heapifyUpward(int idx);
