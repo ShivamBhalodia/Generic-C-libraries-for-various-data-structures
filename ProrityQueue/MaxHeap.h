@@ -1,26 +1,26 @@
 // author : ShivamBhalodia
 
-#ifndef MAXHEAP_H  //if MaxHeap.h hasn't been included yet
-#define MAXHEAP_H  //#define it so the compiler knows it has been included and can prevent including it twice
+#ifndef Heap_H  //if Heap.h hasn't been included yet
+#define Heap_H  //#define it so the compiler knows it has been included and can prevent including it twice
 #include<vector>
 #define left_child(i) (2*i+1)
 #define right_child(i) (2*i+2)
 #define parent_node(i) ((i-1)/2)
 
 template<class T>
-class MaxHeap
+class Heap
 {
     public:
         
-        //Construct empty heap of user defined priority
-        MaxHeap<T>(bool (*comp)(T a,T b));
-        //Return the highest priority item currently in the Max Heap.
+        //Construct empty heap of user defined priority(Max heap or Mean heap)
+        Heap<T>(bool (*comp)(T a,T b));
+        //Return the highest priority item currently in the heap.
         T top();
-        //Insert an item in the Max Heap.
+        //Insert an item in the Heap.
         void push(T a);
-        //Deletes the highest priority item currently in the Max Heap.
+        //Deletes the highest priority item currently in the heap.
         void pop();
-        //To check whether the Max Heap is empty or not
+        //To check whether the Heap is empty or not
         bool isEmpty();
         
     private:
@@ -33,47 +33,47 @@ class MaxHeap
 };
 
 template<class T> 
-MaxHeap<T>::MaxHeap(bool (*comp)(T a,T b))
+Heap<T>::Heap(bool (*comp)(T a,T b))
 {
     this->compare=comp;
 }
 
 template<class T> 
-T MaxHeap<T>::top()
+T Heap<T>::top()
 {
     if(!isEmpty())
     {
-      return heap[0];
+    	return heap[0];
     }
 }
 
 template<class T> 
-void MaxHeap<T>::push(T a)
+void Heap<T>::push(T a)
 {
-    heap.push_back(a);             //First insert new element at the end of the Max heap
-    heapifyUpward(heap.size()-1);    //Then if Max heap is disturbed then fix it
+    heap.push_back(a);             //First insert new element at the end of the heap
+    heapifyUpward(heap.size()-1);    //Then if heap is disturbed then fix it
 }
 
 template<class T> 
-void MaxHeap<T>::pop()
+void Heap<T>::pop()
 {
     if(!isEmpty())
     {
-      	std::swap(heap[0],heap[heap.size()-1]);           ////First replace first element with the last element
+        std::swap(heap[0],heap[heap.size()-1]);           //First replace first element with the last element
         heap.pop_back();
         if(!isEmpty()) 
-       	heapifyDownward(0);            //Then if Max heap is disturbed then fix it
+        heapifyDownward(0);            //Then if heap is disturbed then fix it
     }
 }
 
 template<class T> 
-bool MaxHeap<T>::isEmpty()
+bool Heap<T>::isEmpty()
 {
     return heap.empty();
 }
 
 template<class T> 
-void MaxHeap<T>::heapifyUpward(int idx)           //Fix Max heap in upward direction
+void Heap<T>::heapifyUpward(int idx)           //Fix heap in upward direction
 {
     int p=parent_node(idx);
     if(p<0)
@@ -86,27 +86,27 @@ void MaxHeap<T>::heapifyUpward(int idx)           //Fix Max heap in upward direc
 }
 
 template<class T> 
-void MaxHeap<T>::heapifyDownward(int idx)         //Fix Max heap in downward direction
+void Heap<T>::heapifyDownward(int idx)         //Fix heap in downward direction
 {
-    int largeIdx=idx;
+    int Idx=idx;
     int l=left_child(idx);
     int r=right_child(idx);
     if(l<heap.size())
     {
-        if(compare(heap[largeIdx],heap[l]))
-            largeIdx=l;
+        if(compare(heap[Idx],heap[l]))
+            Idx=l;
     }
     if(r<heap.size())
     {
-        if(compare(heap[largeIdx],heap[r]))
-            largeIdx=r;
+        if(compare(heap[Idx],heap[r]))
+            Idx=r;
     }
 
-    if(largeIdx!=idx)
+    if(Idx!=idx)
     {
-       std::swap(heap[largeIdx],heap[idx]);
-       heapifyDownward(largeIdx);
+       std::swap(heap[Idx],heap[idx]);
+       heapifyDownward(Idx);
     }
 }
 
-#endif // MAXHEAP_H
+#endif // Heap_H
