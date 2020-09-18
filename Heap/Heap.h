@@ -3,6 +3,7 @@
 #ifndef Heap_H  //if Heap.h hasn't been included yet
 #define Heap_H  //#define it so the compiler knows it has been included and can prevent including it twice
 #include<vector>
+
 #define left_child(i) (2*i+1)
 #define right_child(i) (2*i+2)
 #define parent_node(i) ((i-1)/2)
@@ -14,12 +15,16 @@ class Heap
         
         //Construct empty heap of user defined priority(Max heap or Mean heap)
         Heap<T>(bool (*comp)(T a,T b));
-        //Return the highest priority item currently in the heap.
-        T top();
+        
         //Insert an item in the Heap.
         void push(T a);
+        
         //Deletes the highest priority item currently in the heap.
         void pop();
+        
+        //Return the highest priority item currently in the heap.
+        T top();
+        
         //To check whether the Heap is empty or not
         bool isEmpty();
         
@@ -39,15 +44,6 @@ Heap<T>::Heap(bool (*comp)(T a,T b))
 }
 
 template<class T> 
-T Heap<T>::top()
-{
-    if(!isEmpty())
-    {
-    	return heap[0];
-    }
-}
-
-template<class T> 
 void Heap<T>::push(T a)
 {
     heap.push_back(a);             //First insert new element at the end of the heap
@@ -64,6 +60,13 @@ void Heap<T>::pop()
         if(!isEmpty()) 
         heapifyDownward(0);            //Then if heap is disturbed then fix it
     }
+}
+
+template<class T> 
+T Heap<T>::top()
+{
+    if(!isEmpty())
+    	return heap[0];
 }
 
 template<class T> 
@@ -103,9 +106,9 @@ void Heap<T>::heapifyDownward(int idx)         //Fix heap in downward direction
     }
 
     if(Idx!=idx)
-    {
-       std::swap(heap[Idx],heap[idx]);
-       heapifyDownward(Idx);
+    {	
+       	std::swap(heap[Idx],heap[idx]);
+       	heapifyDownward(Idx);
     }
 }
 
