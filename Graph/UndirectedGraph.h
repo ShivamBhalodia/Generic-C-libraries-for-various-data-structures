@@ -1,62 +1,66 @@
-///author : kartik8800
-#ifndef UNDIRECTEDGRAPH_H
-#define UNDIRECTEDGRAPH_H
+// author : ShivamBhalodia
 
+#ifndef UNDIRECTEDGRAPH_H    //if UndirectedGraph.h hasn't been included yet
+#define UNDIRECTEDGRAPH_H    //#define it so the compiler knows it has been included and can prevent including it twice
 #include "Graph.h"
 
+using namespace std;
 
-class UndirectedGraph : public Graph
-{
-    private:
-        void detectCycle(int src, vector<int> &parent, vector<bool> &visited, bool &cycle);
+class UndirectedGraph:public Graph
+{    
     public:
-        UndirectedGraph(int nodes) : Graph(nodes)
-        {
+      
+        UndirectedGraph(int nodes):Graph(nodes)
+        { }
+        
+        void addEdge(int a,int b,int weight);
 
-        }
-
-        virtual bool isCyclic();
-
-        virtual void addEdge(int u, int v, long long w = 1)
-        {
-            adjacencyList[u].push_back({v, w});
-            adjacencyList[v].push_back({u, w});
-        }
-
+        bool isCycle();
+        
+    private:
+    
+        void findCycle(int src,vector<int>&parent,vector<bool>&vis,bool &cycle);
+        
 };
 
-bool UndirectedGraph::isCyclic()
+void UndirectedGraph::addEdge(int a,int b,int weight=1)
 {
-    if(numOfNodes <= 1)
+    graph[a].push_back({b,weight});
+    graph[b].push_back({a,weight});
+}
+
+bool UndirectedGraph::isCycle()
+{
+    if(nodes<=1)
         return false;
-    vector<int> parent(numOfNodes + 1);
-    vector<bool> visited(numOfNodes + 1, 0);
-    bool cycle = 0;
-    parent[1] = 1;
-    detectCycle(1, parent, visited, cycle);
+        
+    bool cycle=false;
+    vector<bool>vis(nodes+1,false);
+    vector<int>parent(nodes+1,false);
+    parent[1]=-1;
+    findCycle(1,parent,vis,cycle);
     return cycle;
 }
 
-void UndirectedGraph::
-    detectCycle(int source, vector<int> &parent, vector<bool> &visited, bool &cycle)
+void UndirectedGraph::findCycle(int source,vector<int>&parent,vector<bool>&vis,bool &cycle)
 {
-   if(cycle)
-      return;
-   visited[source] = 1;
-   for(auto neighbours : adjacencyList[source])
-   {
-       int neighbour = neighbours.first;
-       if(visited[neighbour] && parent[source] != neighbour)
-       {
-          cycle = 1;
-          return;
-       }
-       else if(!visited[neighbour])
-       {
-           parent[neighbour] = source;
-           detectCycle(neighbour, parent, visited, cycle);
-       }
-   }
+    if(cycle)
+        return;
+        
+    vis[source]=true;
+    for(pair<int,int>connected:graph[source])
+    {
+        if(vis[connected.first] && parent[source]!=connected.first)
+        {
+            cycle=true;
+            return;
+        }
+        else if(vis[connected.first]==false)
+        {
+            parent[connected.first]=source;
+            findCycle(connected.first,parent,vis,cycle);
+        }
+    }
 }
 
 #endif // UNDIRECTEDGRAPH_H
