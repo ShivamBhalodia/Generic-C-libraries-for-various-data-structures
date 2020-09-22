@@ -1,86 +1,216 @@
-#ifndef GRAPH_H
-#define GRAPH_H
-#include <vector>
-#include <queue>
+// author : ShivamBhalodia
+
+#ifndef GRAPH_H    //if Graph.h hasn't been included yet
+#define GRAPH_H    //#define it so the compiler knows it has been included and can prevent including it twice
+
+#include<set>
+#include<queue>
+#include<vector>
+
 using namespace std;
+
 class Graph
 {
     public:
-        Graph(int nodes)
+      
+        Graph(int n)       //constructor to construct empty graph with n nodes
         {
-            numOfNodes = nodes;
-            adjacencyList = vector<vector<pair<int,long long>>>(nodes+1);
+            nodes=n;
+            graph=vector<vector<pair<int,int>>>(n+1);   //adjacency list for graph
         }
-        virtual void addEdge(int u, int v, long long weight) = 0;
-        virtual bool isCyclic() = 0;
-        vector<int> breadthFirstTraversal(int source);
-        vector<int> depthFirstTraversal(int source);
-        int getNumberOfNodes()
+        
+        virtual void addEdge(int a,int b,int weight)=0;   //pure virtual function to add an edge
+        
+        virtual bool isCycle()=0;   //pure virtual function to check whether the cycle is present or not
+        
+        vector<int>DFS(int source);   //DFS traversal
+        
+        vector<int>BFS(int source);   //BFS traversal
+        
+        vector<int>dijkstra(int source);  // Shortest path
+        
+        vector<vector<int>>floydWarshall();  //All pair shortest path
+        
+    	long long minimumSpanningTree(int source);   //Spanning tree
+        
+        vector<int>topoSort(int source);    
+        
+        int totalNodes()
         {
-            return numOfNodes;
+            return nodes;
         }
+        
     protected:
-        //number of nodes in the graph
-        int numOfNodes;
-        //adjacency list for the graph
-        //adjList[i] represents direct neighbours of node i
-        //adjList[i].first represents an edge from node i to
-        //node adjList[i].first.
-        //adjList[i].second represents weight of the edge.
-        vector<vector<pair<int,long long>>> adjacencyList;
-        void dfsHelper(int source, vector<int> &nodesDiscovered, vector<bool> &vis);
+      
+        int nodes;
+        vector<vector<pair<int,int>>>graph;   //graph is represented using adjacency list     
+        //pair<vertex,weight>
+        
+        void dfsDone(int source,vector<bool>&vis,vector<int>&dfsOrder);
+        void topoSortDone(int source,vector<bool>&vis,vector<int>&topoSortOrder);
 
 };
 
-vector<int> Graph::breadthFirstTraversal(int source)
+vector<int>Graph::DFS(int source)
 {
-    vector<int> nodesDiscovered;
-    queue<int> nodesToExplore;
-    vector<bool> visited(numOfNodes+1, 0);
+    vector<bool>vis(nodes+1,false);
+    vector<int>dfsOrder;
+    dfsDone(source,vis,dfsOrder);
+    return dfsOrder;
+}
 
-    nodesToExplore.push(source);
-    visited[source] = true;
+void Graph::dfsDone(int source,vector<bool>&vis,vector<int>&dfsOrder)
+{
+    vis[source]=true;
+    dfsOrder.push_back(source);
 
-    while(!nodesToExplore.empty())
+    for(pair<int,int>connected:graph[source])
     {
-       int explore = nodesToExplore.front();
-       nodesToExplore.pop();
-       nodesDiscovered.push_back(explore);
-
-       for(pair<int,long long> neighbours : adjacencyList[explore])
-       {
-           int neighbour = neighbours.first;
-           if(!visited[neighbour])
-           {
-               visited[neighbour] = 1;
-               nodesToExplore.push(neighbour);
-           }
-       }
+    	if(vis[connected.first]==false)
+        {
+            dfsDone(connected.first,vis,dfsOrder);
+        }
     }
-    return nodesDiscovered;
 }
 
-void Graph::dfsHelper(int source,vector<int> &nodesDiscovered, vector<bool> &vis)
+vector<int>Graph::BFS(int source)
 {
-    vis[source] = 1;
-    nodesDiscovered.push_back(source);
+    queue<int>q;
+    vector<bool>vis(nodes+1,false);
+    vector<int>bfsOrder;
+    
+    q.push(source);
+    vis[source]=true;
 
-    for(pair<int,long long> neighbours : adjacencyList[source])
-       {
-           int neighbour = neighbours.first;
-           if(!vis[neighbour])
-           {
-               dfsHelper(neighbour, nodesDiscovered, vis);
-           }
-       }
+    while(q.size())
+    {
+        int current=q.front();
+        q.pop();
+        bfsOrder.push_back(current);
+        
+        for(pair<int,int>connected:graph[current])
+        {
+            if(vis[connected.first]==false)
+            {
+                vis[connected.first]=true;
+                q.push(connected.first);
+            }
+        }
+    }
+    return bfsOrder;
 }
 
-vector<int> Graph::depthFirstTraversal(int source)
+vector<int>Graph::dijkstra(int source)
 {
-      vector<int> nodesDiscovered;
-      vector<bool> vis(numOfNodes + 1, 0);
-      dfsHelper(source, nodesDiscovered, vis);
-      return nodesDiscovered;
+    vector<bool>vis(nodes+1,false);
+    vector<int>distance(nodes+1,1000000000);
+    multiset<pair<int,int>>s;
+    
+    distance[source]=0;
+    s.insert({0,source});
+    
+    while(s.size())
+    {
+        pair<int,int>current=*s.begin();
+        s.erase(s.begin());
+        
+        int vertex=current.second;
+        int weight=current.first;
+        if(vis[vertex]==true)
+        	continue;
+        
+        vis[vertex]=true;
+        
+        for(pair<int,int>connected:graph[vertex])
+        {
+            if(distance[vertex]+connected.second<distance[connected.first])
+            {
+            	distance[connected.first]=distance[vertex]+connected.second;
+                s.insert({distance[connected.first],connected.first});
+            }
+        }
+    }
+    return distance;
 }
+
+vector<vector<int>>Graph::floydWarshall()
+{
+	vector<vector<int>>distance(nodes+1,vector<int>(nodes+1,1000000000));
+	for(int i=1;i<=nodes;i++)
+	{
+		for(pair<int,int>connected:graph[i])
+	    {
+	        distance[i][connected.first]=connected.second;
+	    }
+	    distance[i][i]=0;
+	}
+	for(int k=1;k<=nodes;k++)  
+    {  
+        for(int i=1;i<=nodes;i++)  
+        {  
+            for(int j=1;j<=nodes;j++)  
+            {  
+                if(distance[i][k]+distance[k][j]<distance[i][j])  
+                    distance[i][j]=distance[i][k]+distance[k][j];  
+            }  
+        }  
+    }
+	return distance;
+}
+
+long long Graph::minimumSpanningTree(int source)
+{
+	long long minimumCost=0;
+	vector<bool>vis(nodes+1,false);
+	multiset<pair<int,int>>s;
+	s.insert({0,source});
+	while(s.size())
+	{
+		pair<int,int>current=*s.begin();
+        s.erase(s.begin());
+        
+        int vertex=current.second;
+        int weight=current.first;
+        
+        if(vis[vertex]==true)
+        	continue;
+        	
+        minimumCost+=weight;
+        vis[vertex]=true;
+        
+        for(pair<int,int>connected:graph[vertex])
+        {
+            if(vis[connected.first]==false)
+            {
+            	s.insert({connected.second,connected.first});
+            }
+        }
+	}
+	return minimumCost;
+}
+
+vector<int>Graph::topoSort(int source)
+{
+    vector<bool>vis(nodes+1,false);
+    vector<int>topoSortOrder;
+    topoSortDone(source,vis,topoSortOrder);
+    reverse(topoSortOrder.begin(),topoSortOrder.end());
+    return topoSortOrder;
+}
+
+void Graph::topoSortDone(int source,vector<bool>&vis,vector<int>&topoSortOrder)
+{
+    vis[source]=true;
+    
+    for(pair<int,int>connected:graph[source])
+    {
+        if(vis[connected.first]==false)
+    	{
+            topoSortDone(connected.first,vis,topoSortOrder);
+        }
+    }
+    topoSortOrder.push_back(source);
+}
+
 
 #endif // GRAPH_H
