@@ -1,7 +1,7 @@
 # Graph
 C++ library for graph data structure.
-It includes almost all graph algorithms like dfs,bfs,dijkstra,floydWarshall,<br>
-minimumSpanningTree,Topological sort,check for cycle,strongly connected components for directed graph
+It includes almost all graph algorithms like dfs,bfs,dijkstra,floydWarshall,minimumSpanningTree,<br>
+Topological sort,check for cycle,strongly connected components for directed graph
 By using abstract base class Graph classes derived classes DirectedGraph and UndirectedGraph inherited and implemented
 
 # How to use
