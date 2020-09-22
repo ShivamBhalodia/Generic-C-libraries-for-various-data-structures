@@ -1,141 +1,133 @@
-#ifndef DIRECTEDGRAPH_H
-#define DIRECTEDGRAPH_H
+// author : ShivamBhalodia
+
+#ifndef DIRECTEDGRAPH_H   //if DirectedGraph.h hasn't been included yet
+#define DIRECTEDGRAPH_H   //#define it so the compiler knows it has been included and can prevent including it twice
+
 #include <stack>
 #include "Graph.h"
+
 using namespace std;
 
-class DirectedGraph : public Graph
+class DirectedGraph:public Graph
 {
     public:
-        DirectedGraph(int nodes) : Graph(nodes)
-        {
+      
+        DirectedGraph(int nodes):Graph(nodes)
+        { }
+        
+        void addEdge(int a,int b,int weight);
 
-        }
+        bool isCycle();
 
-        virtual bool isCyclic();
-
-        virtual void addEdge(int u, int v, long long w = 1)
-        {
-            adjacencyList[u].push_back({v, w});
-        }
-        vector<vector<int>> getStronglyConnectedComponents();
+        vector<vector<int>>getSCC();  //SCC->StronglyConnectedComponents
     
     private:
         
-         vector<int> getFinishTimes();
-         void finishTimeHelper(int src, vector<int>& finishTimes, vector<bool>& visited);
-         DirectedGraph getReversal();
-
+        vector<int>findOrder();
+        bool findCycle(int source,vector<bool>&vis,vector<bool>&currentPath);
+        void orderDone(int source,vector<bool>&vis,vector<int>&order);
+        DirectedGraph doReversal();
 };
 
-vector<vector<int>> DirectedGraph :: getStronglyConnectedComponents()
+void DirectedGraph::addEdge(int a,int b,int weight=1)
 {
-            vector<vector<int>> stronglyConnectedComponents;
-            vector<int> finishTimes = this -> getFinishTimes();
-            DirectedGraph reversedGraph = this -> getReversal();
-
-            vector<bool> visited(this -> getNumberOfNodes() + 1, 0);
-
-            for(int i = finishTimes.size() - 1; i >= 0; i--)
-            {
-                vector<int> SCC;
-                if(!visited[finishTimes[i]])
-                {
-                  reversedGraph.dfsHelper(finishTimes[i], SCC, visited);
-                  stronglyConnectedComponents.push_back(SCC);
-                }
-            }
-
-            return stronglyConnectedComponents;
+    graph[a].push_back({b,weight});
 }
 
-vector<int> DirectedGraph :: getFinishTimes()
+bool DirectedGraph::isCycle()
 {
-             vector<int> finishTimes;
-             vector<bool> visited(this -> getNumberOfNodes() + 1, 0);
-
-             for(int src = 1; src <= this -> getNumberOfNodes(); src++)
-             {
-                 if(!visited[src])
-                 {
-                     finishTimeHelper(src, finishTimes, visited);
-                 }
-             }
-
-             return finishTimes;
-}
-
-
-void DirectedGraph :: finishTimeHelper(int src, vector<int>& finishTimes, vector<bool>& visited)
-{
-             visited[src] = 1;
-
-             for(auto neighbour : this -> adjacencyList[src])
-             {
-                 if(!visited[neighbour.first])
-                    finishTimeHelper(neighbour.first, finishTimes, visited);
-             }
-
-             finishTimes.push_back(src);
-}
-
-DirectedGraph DirectedGraph :: getReversal()
-{
-             DirectedGraph gT(this -> getNumberOfNodes());
-
-             for(int node = 1; node <= this -> getNumberOfNodes(); node++)
-             {
-                 for(auto edge : adjacencyList[node])
-                 {
-                     gT.addEdge(edge.first, node);
-                 }
-             }
-
-             return gT;
-}
-
-bool DirectedGraph::isCyclic()
-{
-    int numOfNodes = getNumberOfNodes();
-    if(numOfNodes <= 1)
-       return false;
-    vector<bool> visited(numOfNodes + 1, 0);
-    vector<bool> inPath(numOfNodes + 1, 0);
-    stack<pair<int,int>> path;
-    for(int i=1; i <= numOfNodes; i++)
+    if(nodes<=1)
+      return false;
+      
+    vector<bool>vis(nodes+1,false);
+    vector<bool>currentPath(nodes+1,false);
+    
+    for(int i=1;i<=nodes;i++) 
     {
-        if(visited[i])
-            continue;
-        path.push({i,0});
-        visited[i] = 1;
-        inPath[i] = 1;
-        while(!path.empty())
-        {
-            int source = path.top().first;
-            int idx = path.top().second;
-            path.pop();
-            if(idx == adjacencyList[source].size())
-            {
-                inPath[idx] = 0;
-                continue;
-            }
-            else
-            {
-                int explore = adjacencyList[source][idx].first;
-                if(inPath[explore])
-                    return true;
-                if(visited[explore])
-                {
-                    path.push({source, idx + 1});
-                    continue;
-                }
-                inPath[explore] = visited[explore] = true;
-                path.push({source, idx + 1});
-                path.push({explore, 0});
-            }
-        }
+        if(findCycle(i,vis,currentPath)) 
+            return true;  
     }
     return false;
+}
+
+bool DirectedGraph::findCycle(int source,vector<bool>&vis,vector<bool>&currentPath) 
+{ 
+    if(vis[source]==false) 
+    { 
+        vis[source]=true; 
+        currentPath[source]=true; 
+
+        for(pair<int,int>connected:graph[source])
+        {
+            if(vis[connected.first]==false && findCycle(connected.first,vis,currentPath)) 
+                return true; 
+            else if(currentPath[connected.first]==true) 
+                return true;
+        }
+    
+    } 
+    currentPath[source]=false; 
+    return false; 
+}
+
+vector<vector<int>>DirectedGraph::getSCC()
+{
+    vector<bool>vis(nodes+1,false);
+    vector<vector<int>>stronglyConnectedComponent;
+    vector<int>order=findOrder();
+    DirectedGraph reversedGraph=doReversal();
+
+    for(int i=order.size()-1;i>=0;i--)
+    {
+        vector<int>SCC;
+	    if(vis[order[i]]==false)
+	    {
+	        reversedGraph.dfsDone(order[i],vis,SCC);
+	        stronglyConnectedComponent.push_back(SCC);
+	    }
+    }
+    return stronglyConnectedComponent;
+}
+
+vector<int>DirectedGraph::findOrder()
+{
+    vector<bool>vis(nodes+1,false);
+    vector<int>order;
+    
+    for(int i=1;i<=nodes;i++)
+    {
+        if(vis[i]==false)
+        {
+            orderDone(i,vis,order);
+        }
+    }
+    return order;
+}
+
+
+void DirectedGraph::orderDone(int source,vector<bool>&vis,vector<int>&order)
+{
+    vis[source]=1;
+    for(pair<int,int>connected:graph[source])
+    {
+        if(vis[connected.first]==false)
+            orderDone(connected.first,vis,order);
+    }
+    order.push_back(source);
+}
+
+DirectedGraph DirectedGraph::doReversal()
+{
+    DirectedGraph newGraph(nodes);
+
+    for(int i=1;i<=nodes;i++)
+    {
+        for(pair<int,int>connected:graph[i])
+        {
+            newGraph.addEdge(connected.first,i);
+        }
+    }
+    return newGraph;
 }
 
 #endif // DIRECTEDGRAPH_H
