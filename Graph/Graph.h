@@ -145,16 +145,16 @@ vector<vector<int>>Graph::floydWarshall()
 	    distance[i][i]=0;
 	}
 	for(int k=1;k<=nodes;k++)  
-    {  
-        for(int i=1;i<=nodes;i++)  
-        {  
-            for(int j=1;j<=nodes;j++)  
-            {  
-                if(distance[i][k]+distance[k][j]<distance[i][j])  
-                    distance[i][j]=distance[i][k]+distance[k][j];  
-            }  
-        }  
-    }
+   	{  
+        	for(int i=1;i<=nodes;i++)  
+        	{  
+            		for(int j=1;j<=nodes;j++)  
+            		{  
+                		if(distance[i][k]+distance[k][j]<distance[i][j])  
+                    		distance[i][j]=distance[i][k]+distance[k][j];  
+            		}  
+        	}  
+    	}
 	return distance;
 }
 
@@ -167,24 +167,24 @@ long long Graph::minimumSpanningTree(int source)
 	while(s.size())
 	{
 		pair<int,int>current=*s.begin();
-        s.erase(s.begin());
+        	s.erase(s.begin());
         
-        int vertex=current.second;
-        int weight=current.first;
-        
-        if(vis[vertex]==true)
-        	continue;
-        	
-        minimumCost+=weight;
-        vis[vertex]=true;
-        
-        for(pair<int,int>connected:graph[vertex])
-        {
-            if(vis[connected.first]==false)
-            {
-            	s.insert({connected.second,connected.first});
-            }
-        }
+		int vertex=current.second;
+		int weight=current.first;
+
+		if(vis[vertex]==true)
+			continue;
+
+		minimumCost+=weight;
+		vis[vertex]=true;
+
+		for(pair<int,int>connected:graph[vertex])
+		{
+		    if(vis[connected.first]==false)
+		    {
+			s.insert({connected.second,connected.first});
+		    }
+		}
 	}
 	return minimumCost;
 }
