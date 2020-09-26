@@ -12,7 +12,7 @@ C++ library for Segment Tree.
      
 3)int sum(int x,int y)<br>
   {return x+y;}<br> 
-  SegmentTree<int> rangeSumQueries(data,0,sum);<br>
+  SegTree<int>rangeSumQueries(data,0,sum);<br>
    
    
 # Options
