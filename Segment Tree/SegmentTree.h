@@ -1,134 +1,134 @@
-///author : kartik8800
-#ifndef SEGMENTTREE_H
-#define SEGMENTTREE_H
-#define left(i) (2*i + 1)
-#define right(i) (2*i + 2)
-#define parent(i) ((i-1)/2)
+// author : ShivamBhalodia
+#ifndef SEGTREE_H  //if SegTree.h hasn't been included yet
+#define SEGTREE_H  //#define it so the compiler knows it has been included and can prevent including it twice
+
 #include <vector>
+#define left_child(i) (2*i+1)
+#define right_child(i) (2*i+2)
+#define parent_node(i) ((i-1)/2)
+
+using namespace std;
 
 template<class T>
-class SegmentTree
+class SegTree
 {
     public:
-        //tree constructors.
-        SegmentTree(std::vector<T> data, T value, T (*combine)(T obj1, T obj2));
-        SegmentTree(T ar[], int n, T value, T (*combine)(T obj1, T obj2));
+      
+        //SegTree constructor.
+        SegTree(vector<T>data,T value,T(*combine)(T a,T b));
         
-        //query the range l to r, 0 based array indexing.
-        T query(int l, int r);
+        //0 based array indexing.
+        T query(int l,int r);
         
-        //update the element at index idx to val.
-        void update(int idx, T val);
-        ///TODO lazy propagation
+        //point update
+        void update(int ind,T val);
+        
     private:
-        //represents the segment tree.
-        T *tree;
-    
-        //builds the segment tree.
-        void buildTree(std::vector<T> data);
+    	
         
-        //size of the segment tree array.
+        T *tree;
+    	vector<T>data;
+    	int n;
         int segTreeSize;
-    
-        //extra nodes must be added to array to make its size a power of 2
-        //this is the value to be filled for the those nodes.
-        T valueForExtraNodes;
-    
-        //specifies how to combine child node results to form parent node result.
-        T (*combine)(T obj1, T obj2);
-    
-        //used to calculate the size of array needed to store the tree.
-        int calculateSize(int n);
-    
-        //helps to solve a range query.
-        T queryHelper(int l,int r, int st, int ed, int node);
+        T dummyNodeValue;          //Identity value for extra nodes
+        
+        
+        int sizeOfSegTree();
+        void buildTree(int si,int ss,int se);
+        T (*combine)(T a, T b);
+        T queryDone(int si,int ss,int se,int qs,int qe);
+        void updateDone(int si,int ss,int se,int ind);
 };
 
-template<class T> SegmentTree<T>::SegmentTree(std::vector<T> data,
-                                                T value, T (*combine)(T obj1, T obj2))
+template<class T> 
+SegTree<T>::SegTree(vector<T>data,T value,T (*combine)(T a,T b))
 {
-   this->combine = combine;
-   valueForExtraNodes = value;
-   segTreeSize = calculateSize(data.size());
-   buildTree(data);
+	n=data.size();
+	dummyNodeValue=value;
+  	segTreeSize=sizeOfSegTree();
+    this->data=data;
+    this->combine=combine;
+    tree=new T[segTreeSize];
+    int ss=0,se=n-1;
+    buildTree(0,ss,se);
 }
 
-template<class T> SegmentTree<T>::SegmentTree(T ar[], int n,
-                                            T value, T (*combine)(T obj1, T obj2))
+template<class T> 
+int SegTree<T>::sizeOfSegTree()
 {
-   this->combine = combine;
-   valueForExtraNodes = value;
-   segTreeSize = calculateSize(n);
-
-   std::vector<T> data;
-   for(int i = 0; i < n; i++)
-         data.push_back(ar[i]);
-
-   buildTree(data);
-}
-
-
-template<class T> int SegmentTree<T>::calculateSize(int n)
-{
-    int pow2 = 1;
-    while( pow2 < n)
+  
+	/*
+	If n is a power of 2, then there are no dummy nodes. 
+	So the size of the segment tree is 2n-1(n leaf nodes and n-1 internal nodes). 
+	If n is not a power of 2,
+	then the size of the tree will be 2*x–1(x is the smallest power of 2 greater than n)
+	*/
+  
+  	int powOf2=1;
+    while(powOf2<n)
     {
-        pow2 = pow2 << 1;
+        powOf2=powOf2<<1;
     }
-    return 2*pow2 - 1;
+    return 2*powOf2-1;
 }
 
-template<class T> T SegmentTree<T>::query(int l, int r)
+template<class T> 
+void SegTree<T>::buildTree(int si,int ss,int se)
 {
-    int st = 0, ed = segTreeSize/2;
-    return queryHelper(l, r, st, ed, 0);
+  	if(ss==se)
+  	{
+    	tree[si]=data[ss];
+    	return;
+  	}
+  	int mid=ss+((se-ss)/2);
+  	buildTree(left_child(si),ss,mid);
+  	buildTree(right_child(si),mid+1,se);
+  	tree[si]=combine(tree[left_child(si)],tree[right_child(si)]);
+
 }
 
-template<class T> T SegmentTree<T>::queryHelper(int l,int r, int st, int ed, int node)
+template<class T> 
+T SegTree<T>::query(int l,int r)
 {
-    if( (r < st) || (l > ed) || (l > r) )
-        return valueForExtraNodes;
-    if(st >= l && ed <= r)
-        return tree[node];
-    T leftVal = queryHelper(l, r, st, (st + ed)/2, left(node));
-    T rightVal = queryHelper(l, r, (st+ed)/2 + 1, ed, right(node));
-    return combine(leftVal, rightVal);
+    int ss=0,se=n-1;
+    return queryDone(0,ss,se,l,r);
 }
 
-template<class T> void SegmentTree<T>::buildTree(std::vector<T> data)
+template<class T> 
+T SegTree<T>::queryDone(int si,int ss,int se,int qs,int qe)
 {
-   int n = data.size();
-   tree = new T[segTreeSize];
-   int extraNodes = (segTreeSize/2 + 1) - n;
-   for(int i = segTreeSize - 1; i >= 0; i--)
-   {
-       if(extraNodes>0)
-           {
-               tree[i] = valueForExtraNodes;
-               extraNodes--;
-           }
-       else if(n>0)
-           {
-               tree[i] = data[n-1];
-               n--;
-           }
-       else
-           tree[i] = combine(tree[left(i)], tree[right(i)]);
-   }
+	if(qs>se || qe<ss || qs>qe)
+		return dummyNodeValue;
+	if(ss>=qs && se<=qe)
+		return tree[si];
+	int mid=ss+((se-ss)/2);
+	T left=queryDone(left_child(si),ss,mid,qs,qe);
+	T right=queryDone(right_child(si),mid+1,se,qs,qe);
+	return combine(left,right);
 }
 
-template<class T> void SegmentTree<T>::update(int idx, T val)
+template<class T> 
+void SegTree<T>::update(int ind,T val)
 {
-    int segTreeIdx = (segTreeSize/2) + idx;
-    tree[segTreeIdx] = val;
-    while(parent(segTreeIdx) >= 0)
-    {
-        segTreeIdx = parent(segTreeIdx);
-        if(right(segTreeIdx) < segTreeSize)
-          tree[segTreeIdx] = combine(tree[left(segTreeIdx)], tree[right(segTreeIdx)]);
-        if(segTreeIdx == 0)
-            break;
-    }
+    data[ind]=val;
+    int ss=0,se=n-1;
+    updateDone(0,ss,se,ind);
 }
 
-#endif // SEGMENTTREE_H
+template<class T> 
+void SegTree<T>::updateDone(int si,int ss,int se,int ind)
+{
+	if(ss==se)
+  	{
+    	tree[si]=data[ss];
+    	return;
+  	}
+  	int mid=ss+((se-ss)/2);
+  	if(ind<=mid)
+  	updateDone(left_child(si),ss,mid,ind);
+  	else
+  	updateDone(right_child(si),mid+1,se,ind);
+  	tree[si]=combine(tree[left_child(si)],tree[right_child(si)]);	
+}
+
+#endif // SEGTREE
