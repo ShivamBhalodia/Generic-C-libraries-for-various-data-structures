@@ -1,23 +1,23 @@
-# segTree
-General purpose segment tree library.
+# Segment Tree
+C++ library for Segment Tree.
 
-1. include SegmentTree.h
-2. to construct a segment tree you need to specify the following:<br>
-   a. The datatype of array for which the tree is being constructed.<br>
-   b. an array or vector for which the tree is to be constructed.<br>
-   c. a value that can be used to fill the extra nodes of the tree.<br>
-   d. a function combine that specifies how the result of left and right child of a node<br> 
-        should be used to generate the value of current node.
-3. Example usage:      
-   int small(int x,int y){return min(x,y);}<br>
-   SegmentTree < int > rangeMinQueries(dataVector,INT_MAX,small);<br>
+# How to use
+1)include "SegTree.h" in your .cpp(source) file.
+2)Construct tree by specifying as below:<br>
+   I).   The datatype for which the tree is being constructed.<br>
+   II).  Vector of data<br>
+   III). Identity value for extra nodes<br>
+   IV).  Combine function that specifies how the result of left and right child of a node<br> 
+         should be used to generate the value of current node.
+3)int sum(int x,int y)<br>
+  {<br>
+      return x+y;<br>
+  }<br>  
+  SegmentTree<int> rangeSumQueries(data,0,sum);<br>
    
-   int sum(int x,int y){return x+y;}<br>
-   SegmentTree < int > rangeSumQueries(dataVector,0,sum);<br>
    
-   long long product(long long x,long long y){return x*y;}<br>
-   SegmentTree < long long > rangeProductQueries(dataVector,1,product);<br>
-   
-solution to SPOJ GSS1 using segTree library : https://ideone.com/EFxf6O<br>
-solution to SPOJ KGSS using segTree library : https://ideone.com/fUK5Jz<br>
+# Options
+1)Build Tree<br>
+2)Query Tree<br>
+3)Update Tree(point)
 
