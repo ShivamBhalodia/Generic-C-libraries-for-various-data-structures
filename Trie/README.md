@@ -4,7 +4,7 @@ C++ library for Trie Data Structure
 # How to use
 1)include "Trie.h" in your .cpp(source) file.<br>
 2)Declare it using "Trie instancename(vector_of_strings)" or  "Trie instancename()"<br>
-Ex.  vector<string>v; Trie my(v);
+Ex.  vector < string > v; Trie my(v);
   
 # Options
 1)Create an empty trie or the trie with some words.<br>
