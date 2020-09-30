@@ -23,8 +23,8 @@ class Trie
 {
 	public:
 		
-      	//Constructor to create an empty trie.
-    	Trie();
+      	    //Constructor to create an empty trie.
+    	    Trie();
       
 	    //Constructor to create a trie with some words.
 	    Trie(vector<string>s);
@@ -55,7 +55,7 @@ class Trie
       
   	private:
   		
-		node *root;
+	    node *root;
 	    int totalWords;
 	      
 	    void displayTrieDone(node *temp,string prefix,vector<string>&trieToList);
@@ -98,31 +98,31 @@ void Trie::insert(string s)
           	temp->childNode[s[i]]=newNode();
       	}
       	temp=temp->childNode[s[i]];
-  	}
+    }
   
-  	temp->isEndOfWord=true;
-  	temp->totalPrefix++;
-  	totalWords++;
+    temp->isEndOfWord=true;
+    temp->totalPrefix++;
+    totalWords++;
 }
 
 void Trie::remove(string s)
 {
 	if(checkWord(s))
-    {
-    	totalWords--;
-    	root=removeDone(root,s,0);
+    	{
+    		totalWords--;
+    		root=removeDone(root,s,0);
 	}	
 }
 
 node* Trie::removeDone(node *temp,string s,int depth=0)
 {
     if(temp==NULL)
-		return NULL;
+	    return NULL;
 
     temp->totalPrefix--;
     
     if(depth==s.size()) 
-  	{ 
+    { 
         if(temp->isEndOfWord) 
             temp->isEndOfWord=false; 
   
@@ -137,7 +137,7 @@ node* Trie::removeDone(node *temp,string s,int depth=0)
     temp->childNode[s[depth]]=removeDone(temp->childNode[s[depth]],s,depth+1); ;
   
     if(isEmpty(temp) && temp->isEndOfWord==false) 
-  	{ 
+    { 
         //delete(temp); 
         //temp=NULL; 
     } 
@@ -158,7 +158,7 @@ vector<string>Trie::displayTrie()
 
 void Trie::displayTrieDone(node *temp,string prefix,vector<string>&trieToList)
 {
-  	if(temp->isEndOfWord)
+    if(temp->isEndOfWord)
     {
         trieToList.push_back(prefix);
     }
@@ -187,14 +187,14 @@ bool Trie::isEmpty(node *temp)
 
 int Trie::totalPrefixWords(string prefix,int check=1)
 {
-  	if(root==NULL)
-        return 0;
+    if(root==NULL)
+    return 0;
     node *temp=root;
     for(int i=0;i<prefix.length();i++)
     { 
         auto it=temp->childNode.find(prefix[i]);
         if(it==temp->childNode.end())
-          	return 0;
+            return 0;
         else
             temp=temp->childNode[prefix[i]];
     }
