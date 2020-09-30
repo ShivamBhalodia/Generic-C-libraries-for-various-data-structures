@@ -181,7 +181,6 @@ bool Trie::checkWord(string s)
 
 bool Trie::isEmpty(node *temp) 
 { 
-    //cout<<temp->childNode.size()<<"*"<<endl;
     if(temp->childNode.size()==0)
     	return true; 
 } 
