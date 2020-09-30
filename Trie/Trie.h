@@ -23,8 +23,8 @@ class Trie
 {
 	public:
 		
-      	    //Constructor to create an empty trie.
-    	    Trie();
+      	//Constructor to create an empty trie.
+    	Trie();
       
 	    //Constructor to create a trie with some words.
 	    Trie(vector<string>s);
@@ -108,9 +108,9 @@ void Trie::insert(string s)
 void Trie::remove(string s)
 {
 	if(checkWord(s))
-    	{
-    		totalWords--;
-    		root=removeDone(root,s,0);
+    {
+    	totalWords--;
+    	root=removeDone(root,s,0);
 	}	
 }
 
@@ -189,6 +189,7 @@ int Trie::totalPrefixWords(string prefix,int check=1)
 {
     if(root==NULL)
     return 0;
+    
     node *temp=root;
     for(int i=0;i<prefix.length();i++)
     { 
