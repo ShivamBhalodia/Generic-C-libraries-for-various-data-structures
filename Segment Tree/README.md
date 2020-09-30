@@ -11,8 +11,8 @@ C++ library for Segment Tree.
      should be used to generate the value of current node.<br>
      
 3)int sum(int x,int y)<br>
-  {return x+y;}<br> 
-  SegTree<int>rangeSumQueries(data,0,sum);<br>
+  { return x+y ; }<br> 
+  SegTree < int > rangeSumQueries(data,0,sum);<br>
    
    
 # Options
